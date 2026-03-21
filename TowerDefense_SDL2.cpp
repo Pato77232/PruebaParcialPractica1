@@ -68,6 +68,7 @@ struct Oleada {
     int vidaTanque;
 };
 
+
 struct NodoEnemigo {
     Enemigo      dato;
     NodoEnemigo* anterior;
@@ -80,6 +81,7 @@ struct NodoOleada {
     NodoOleada* siguiente;
     NodoOleada(Oleada o): dato(o), siguiente(nullptr){}
 };
+
 
 class ListaTorres {
     Torre datos[MAX_TORRES];
@@ -193,8 +195,6 @@ public:
     bool        estaVacio()  const { return !ultimo; }
 };
 
-
-//  ESTADO DEL JUEGO
 struct EstadoJuego {
     int  vidas;
     int  turno;
@@ -203,8 +203,6 @@ struct EstadoJuego {
     bool victoria;
     EstadoJuego(): vidas(5), turno(0), oro(200), terminado(false), victoria(false){}
 };
-
-//  LOG Y MENÚ
 
 struct LogSistema {
     vector<string> lineas;
@@ -222,8 +220,6 @@ struct DatosTorreTemp {
     int    posicion, danio, rango, costo, paso;
     DatosTorreTemp(){ nombre=""; tipo=""; posicion=-1; danio=0; rango=0; costo=0; paso=0; }
 };
-
-//  CARGA DE 20 OLEADAS PROGRESIVAS
 
 void cargarOleadas(ListaOleadas& ols){
     // n=normales r=rapidos t=tanques vn/vr/vt=vida base
@@ -257,7 +253,6 @@ void cargarOleadas(ListaOleadas& ols){
     }
 }
 
-//  LÓGICA DEL TURNO
 
 void procesarTurno(ListaTorres& torres, ListaEnemigos& enemigos,
                    ListaOleadas& oleadas, EstadoJuego& est, LogSistema& log){
@@ -307,7 +302,6 @@ void procesarTurno(ListaTorres& torres, ListaEnemigos& enemigos,
     }
 }
 
-//  HELPERS SDL2
 
 void setCol(SDL_Renderer* r,SDL_Color c){ SDL_SetRenderDrawColor(r,c.r,c.g,c.b,c.a); }
 void fillR(SDL_Renderer* r,int x,int y,int w,int h,SDL_Color c){ setCol(r,c); SDL_Rect rc{x,y,w,h}; SDL_RenderFillRect(r,&rc); }
@@ -329,8 +323,9 @@ void drawBarra(SDL_Renderer* r,int x,int y,int w,int h,int act,int mx){
     if(ll>0)fillR(r,x,y,ll,h,c);
     drawR(r,x,y,w,h,{80,80,80,180});
 }
-//definimos como se mostrara el hud de nuestrojuego
+
 int posAX(int p){ return RUTA_INI_X+p*CELDA_PX; }
+
 
 void dibujarHUD(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
                 EstadoJuego& est,ListaOleadas& ols,ListaTorres& torres){
@@ -343,6 +338,7 @@ void dibujarHUD(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
     drawTxt(r,fN,"Oleada: "+to_string(ols.getLanzadas())+"/20",480,15,C_AZUL);
     drawTxt(r,fN,"Torres: "+to_string(torres.contar())+"/"+to_string(MAX_TORRES),650,15,C_VERDE);
 }
+
 
 void dibujarJuego(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
                   ListaTorres& torres,ListaEnemigos& enemigos){
@@ -397,7 +393,7 @@ void dibujarJuego(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
         nd=nd->siguiente;
     }
 }
-//represenaciones logicas graficas
+
 void dibujarLog(SDL_Renderer* r,TTF_Font* fP,LogSistema& log){
     int ly=HUD_H+JUEGO_H;
     fillR(r,0,ly,PANEL_X,LOG_H,C_PANEL);
@@ -406,7 +402,7 @@ void dibujarLog(SDL_Renderer* r,TTF_Font* fP,LogSistema& log){
     for(int i=0;i<(int)log.lineas.size();i++)
         drawTxt(r,fP,log.lineas[i],8,ly+20+i*13,C_TEXTO);
 }
-//se dibuja cada panel para el juego
+
 void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
                   MenuEstado est,DatosTorreTemp& tmp,
                   ListaTorres& torres,ListaOleadas& ols,
@@ -431,7 +427,7 @@ void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
         }
         y+=8; drawL(r,PANEL_X,y,PANEL_X+PANEL_W,y,C_BORDE); y+=10;
 
-        // Estado rÃ¡pido de torres en campo
+        // Estado rápido de torres en campo
         drawTxt(r,fP,"Torres en campo ("+to_string(torres.contar())+"/"+to_string(MAX_TORRES)+"):",x,y,C_SEC); y+=17;
         if(torres.contar()==0){
             drawTxt(r,fP,"  Sin torres",x,y,C_SEC); y+=15;
@@ -472,7 +468,7 @@ void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
             }
         }
         y+=10;
-        drawTxt(r,fP,"ENTER = confirmar | ESC = cancelar",x,y,C_SEC);//se dibuja paso a paso cada uno de lo menus y caracteristicas del juego
+        drawTxt(r,fP,"ENTER = confirmar | ESC = cancelar",x,y,C_SEC);
 
     } else if(est==MENU_ELIM_TORRE){
         drawTxt(r,fN,"== ELIMINAR TORRE ==",x,y,C_NARANJA); y+=28;
@@ -491,7 +487,7 @@ void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
             drawR(r,x,y,PANEL_W-24,22,C_ROJO);
             drawTxt(r,fP,"> "+inp+"_",x+4,y+4,C_TEXTO); y+=30;
             drawTxt(r,fP,"ENTER = confirmar | ESC = cancelar",x,y,C_SEC);
-        }//menu de eliminacion de torres
+        }
 
     } else if(est==MENU_VER_TORRES){
         drawTxt(r,fN,"== TORRES REGISTRADAS ==",x,y,C_VERDE); y+=28;
@@ -506,7 +502,7 @@ void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
                 drawTxt(r,fP,"  Pos:"+to_string(t.posicion)+" Dmg:"+to_string(t.danio)+
                           " Rng:"+to_string(t.rango)+" Costo:"+to_string(t.costo),x,y,C_SEC); y+=18;
             }
-        }//menu de visualizacion de torres
+        }
         y=ALTO-30; drawTxt(r,fP,"[ESC] Volver al menu",x,y,C_ROJO);
 
     } else if(est==MENU_VER_OLEADAS){
@@ -543,4 +539,201 @@ void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
         drawTxt(r,fP,err,PANEL_X+8,ALTO-44,C_ROJO);
         drawTxt(r,fP,"Presiona cualquier tecla",PANEL_X+8,ALTO-28,C_SEC);
     }
+}
+
+void dibujar(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
+             ListaTorres& torres,ListaEnemigos& enemigos,
+             ListaOleadas& ols,EstadoJuego& est,LogSistema& log,
+             MenuEstado menuEst,DatosTorreTemp& tmp,
+             const string& inp,const string& err,bool hayErr){
+    fillR(r,0,0,ANCHO,ALTO,C_BG);
+    dibujarHUD(r,fN,fP,est,ols,torres);
+    dibujarJuego(r,fN,fP,torres,enemigos);
+    dibujarLog(r,fP,log);
+    dibujarPanel(r,fN,fP,menuEst,tmp,torres,ols,inp,err,hayErr);
+
+    if(est.terminado){
+        SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
+        fillR(r,0,0,PANEL_X,ALTO,{0,0,0,170});
+        SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_NONE);
+        if(est.victoria){
+            drawTxt(r,fN,"VICTORIA!",PANEL_X/2,ALTO/2-30,C_VERDE,true);
+            drawTxt(r,fP,"Completaste las 20 oleadas",PANEL_X/2,ALTO/2+10,C_TEXTO,true);
+        } else {
+            drawTxt(r,fN,"GAME OVER",PANEL_X/2,ALTO/2-30,C_ROJO,true);
+            drawTxt(r,fP,"Perdiste todas tus vidas",PANEL_X/2,ALTO/2+10,C_TEXTO,true);
+        }
+        drawTxt(r,fP,"[ESC] Salir",PANEL_X/2,ALTO/2+35,C_SEC,true);
+    }
+    SDL_RenderPresent(r);
+}
+
+//  MAIN
+int main(int argc,char* argv[]){
+    srand((unsigned)time(nullptr));
+    if(SDL_Init(SDL_INIT_VIDEO)<0){cerr<<"SDL:"<<SDL_GetError();return 1;}
+    if(TTF_Init()<0){cerr<<"TTF:"<<TTF_GetError();SDL_Quit();return 1;}
+
+    SDL_Window*   ven=SDL_CreateWindow("Tower Defense - Estructura de Datos en C++",
+                      SDL_WINDOWPOS_CENTERED,SDL_WINDOWPOS_CENTERED,ANCHO,ALTO,SDL_WINDOW_SHOWN);
+    SDL_Renderer* ren=SDL_CreateRenderer(ven,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+
+    const char* rN[]={"C:/Windows/Fonts/arialbd.ttf","C:/Windows/Fonts/calibrib.ttf",
+                       "C:/Windows/Fonts/verdanab.ttf","C:/Windows/Fonts/arial.ttf",
+                       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",nullptr};
+    const char* rP[]={"C:/Windows/Fonts/arial.ttf","C:/Windows/Fonts/calibri.ttf",
+                       "C:/Windows/Fonts/verdana.ttf",
+                       "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",nullptr};
+    TTF_Font* fN=nullptr,*fP=nullptr;
+    for(int i=0;rN[i];i++){fN=TTF_OpenFont(rN[i],16);if(fN)break;}
+    for(int i=0;rP[i];i++){fP=TTF_OpenFont(rP[i],12);if(fP)break;}
+
+    // Estructuras de datos
+    ListaTorres   torres;
+    ListaEnemigos enemigos;
+    ListaOleadas  oleadas;
+    EstadoJuego   estado;
+    LogSistema    log;
+
+    cargarOleadas(oleadas);
+    torres.insertar("Arquero","Arquero",3,20,2,50);
+    torres.insertar("Canon","Canon",8,35,3,80);
+    log.agregar("Caso de prueba listo: 2 torres, 20 oleadas.");
+    log.agregar("Usa [5] para iniciar la primera oleada.");
+
+    // Estado del menú
+    MenuEstado     menuEst=MENU_PRINCIPAL;
+    DatosTorreTemp tmp;
+    string         inputBuf="", msgErr="";
+    bool           hayErr=false;
+
+    bool corriendo=true;
+    SDL_Event ev;
+
+    while(corriendo){
+        while(SDL_PollEvent(&ev)){
+            if(ev.type==SDL_QUIT){corriendo=false;break;}
+
+            if(ev.type==SDL_KEYDOWN){
+                SDL_Keycode k=ev.key.keysym.sym;
+
+                // Limpiar error con cualquier tecla
+                if(hayErr){hayErr=false;msgErr="";continue;}
+
+                if(menuEst==MENU_PRINCIPAL){
+                    if(k==SDLK_ESCAPE){corriendo=false;}
+                    else if(k==SDLK_1){
+                        if(torres.contar()>=MAX_TORRES){msgErr="Limite de 20 torres alcanzado!";hayErr=true;}
+                        else{tmp=DatosTorreTemp();inputBuf="";menuEst=MENU_REG_TORRE;}
+                    }
+                    else if(k==SDLK_2){menuEst=MENU_VER_TORRES;}
+                    else if(k==SDLK_3){
+                        if(torres.contar()==0){msgErr="No hay torres que eliminar.";hayErr=true;}
+                        else{inputBuf="";menuEst=MENU_ELIM_TORRE;}
+                    }
+                    else if(k==SDLK_4){menuEst=MENU_VER_OLEADAS;}
+                    else if(k==SDLK_5){
+                        if(oleadas.estaVacio()){msgErr="No hay oleadas.";hayErr=true;}
+                        else if(!enemigos.estaVacio()){msgErr="Hay enemigos activos en campo.";hayErr=true;}
+                        else if(oleadas.getLanzadas()>=oleadas.contar()){msgErr="Todas las oleadas lanzadas.";hayErr=true;}
+                        else{
+                            Oleada* ol=oleadas.avanzar();
+                            if(ol){
+                                for(int i=0;i<ol->cantNormales;i++) enemigos.insertarAlFinal("Normal",ol->vidaNormal,1,15);
+                                for(int i=0;i<ol->cantRapidos;i++)  enemigos.insertarAlFinal("Rapido",ol->vidaRapido,2,20);
+                                for(int i=0;i<ol->cantTanques;i++)  enemigos.insertarAlFinal("Tanque",ol->vidaTanque,1,40);
+                                int tot=ol->cantNormales+ol->cantRapidos+ol->cantTanques;
+                                log.agregar("Oleada "+to_string(ol->idOleada)+" iniciada! "+to_string(tot)+" enemigos.");
+                            }
+                        }
+                    }
+                    else if(k==SDLK_6){procesarTurno(torres,enemigos,oleadas,estado,log);}
+                }
+
+                else if(menuEst==MENU_REG_TORRE){
+                    if(k==SDLK_ESCAPE){menuEst=MENU_PRINCIPAL;inputBuf="";}
+                    else if(k==SDLK_RETURN||k==SDLK_KP_ENTER){
+                        bool ok=true;
+                        if(tmp.paso==0){
+                            if(inputBuf.empty()){msgErr="Nombre vacio.";hayErr=true;ok=false;}
+                            else tmp.nombre=inputBuf;
+                        } else if(tmp.paso==1){
+                            if(inputBuf=="1"){tmp.tipo="Arquero";tmp.danio=20;tmp.rango=2;tmp.costo=50;}
+                            else if(inputBuf=="2"){tmp.tipo="Canon";tmp.danio=35;tmp.rango=3;tmp.costo=80;}
+                            else if(inputBuf=="3"){tmp.tipo="Mago";tmp.danio=25;tmp.rango=4;tmp.costo=100;}
+                            else{msgErr="Elige 1, 2 o 3.";hayErr=true;ok=false;}
+                        } else if(tmp.paso==2){
+                            int p=atoi(inputBuf.c_str());
+                            if(p<0||p>LIMITE_RUTA-1){msgErr="Posicion invalida (0-19).";hayErr=true;ok=false;}
+                            else if(!torres.casillaLibre(p)){msgErr="Casilla "+to_string(p)+" ocupada!";hayErr=true;ok=false;}
+                            else tmp.posicion=p;
+                        } else if(tmp.paso==3){
+                            int d=atoi(inputBuf.c_str());
+                            if(d<=0){msgErr="Danio debe ser >0.";hayErr=true;ok=false;}
+                            else tmp.danio=d;
+                        } else if(tmp.paso==4){
+                            int rn=atoi(inputBuf.c_str());
+                            if(rn<=0){msgErr="Rango debe ser >0.";hayErr=true;ok=false;}
+                            else tmp.rango=rn;
+                        } else if(tmp.paso==5){
+                            int c=atoi(inputBuf.c_str());
+                            if(c<0){msgErr="Costo invalido.";hayErr=true;ok=false;}
+                            else if(c>estado.oro){msgErr="Oro insuficiente! ("+to_string(estado.oro)+")";hayErr=true;ok=false;}
+                            else tmp.costo=c;
+                        }
+                        if(ok){
+                            inputBuf=""; tmp.paso++;
+                            if(tmp.paso>=6){
+                                string err=torres.insertar(tmp.nombre,tmp.tipo,tmp.posicion,tmp.danio,tmp.rango,tmp.costo);
+                                if(err.empty()){
+                                    estado.oro-=tmp.costo;
+                                    log.agregar("Torre '"+tmp.nombre+"' en pos."+to_string(tmp.posicion)+" colocada!");
+                                    menuEst=MENU_PRINCIPAL;
+                                } else {msgErr=err;hayErr=true;menuEst=MENU_PRINCIPAL;}
+                            }
+                        }
+                    }
+                    else if(k==SDLK_BACKSPACE){if(!inputBuf.empty())inputBuf.pop_back();}
+                }
+
+                else if(menuEst==MENU_ELIM_TORRE){
+                    if(k==SDLK_ESCAPE){menuEst=MENU_PRINCIPAL;inputBuf="";}
+                    else if(k==SDLK_RETURN||k==SDLK_KP_ENTER){
+                        int id=atoi(inputBuf.c_str());
+                        if(torres.eliminar(id)){log.agregar("Torre #"+to_string(id)+" eliminada.");menuEst=MENU_PRINCIPAL;}
+                        else{msgErr="Torre #"+to_string(id)+" no existe.";hayErr=true;}
+                        inputBuf="";
+                    }
+                    else if(k==SDLK_BACKSPACE){if(!inputBuf.empty())inputBuf.pop_back();}
+                }
+
+                else if(menuEst==MENU_VER_TORRES||menuEst==MENU_VER_OLEADAS){
+                    if(k==SDLK_ESCAPE) menuEst=MENU_PRINCIPAL;
+                }
+            }
+
+            // Entrada de texto (más confiable con teclados no-ASCII)
+            if(ev.type==SDL_TEXTINPUT&&!hayErr){
+                if(menuEst==MENU_REG_TORRE||menuEst==MENU_ELIM_TORRE){
+                    string s=ev.text.text;
+                    // Filtro: solo letras y numeros para nombre (paso 0), solo numeros para el resto
+                    for(char c:s){
+                        if(menuEst==MENU_ELIM_TORRE&&c>='0'&&c<='9'&&inputBuf.size()<5) inputBuf+=c;
+                        else if(menuEst==MENU_REG_TORRE){
+                            if(tmp.paso==0&&inputBuf.size()<18) inputBuf+=c;  // nombre: cualquier char
+                            else if(tmp.paso>=1&&c>='0'&&c<='9'&&inputBuf.size()<5) inputBuf+=c;
+                        }
+                    }
+                }
+            }
+        }
+
+        dibujar(ren,fN,fP,torres,enemigos,oleadas,estado,log,menuEst,tmp,inputBuf,msgErr,hayErr);
+        SDL_Delay(16);
+    }
+
+    if(fN)TTF_CloseFont(fN); if(fP)TTF_CloseFont(fP);
+    SDL_DestroyRenderer(ren); SDL_DestroyWindow(ven);
+    TTF_Quit(); SDL_Quit();
+    return 0;
 }
