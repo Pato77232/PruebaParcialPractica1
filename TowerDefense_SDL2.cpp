@@ -194,7 +194,7 @@ public:
     int         getLanzadas()const { return lanzadas; }
     bool        estaVacio()  const { return !ultimo; }
 };
-
+//Estado del juego
 struct EstadoJuego {
     int  vidas;
     int  turno;
@@ -203,7 +203,7 @@ struct EstadoJuego {
     bool victoria;
     EstadoJuego(): vidas(5), turno(0), oro(200), terminado(false), victoria(false){}
 };
-
+//Log y Menú
 struct LogSistema {
     vector<string> lineas;
     void agregar(const string& s){
@@ -220,7 +220,7 @@ struct DatosTorreTemp {
     int    posicion, danio, rango, costo, paso;
     DatosTorreTemp(){ nombre=""; tipo=""; posicion=-1; danio=0; rango=0; costo=0; paso=0; }
 };
-
+//20 Oleadas para Prueba
 void cargarOleadas(ListaOleadas& ols){
     // n=normales r=rapidos t=tanques vn/vr/vt=vida base
     int def[20][6]={
@@ -253,7 +253,7 @@ void cargarOleadas(ListaOleadas& ols){
     }
 }
 
-
+//Lógica de turno
 void procesarTurno(ListaTorres& torres, ListaEnemigos& enemigos,
                    ListaOleadas& oleadas, EstadoJuego& est, LogSistema& log){
     if(est.terminado){ log.agregar("El juego ha terminado."); return; }
@@ -302,7 +302,7 @@ void procesarTurno(ListaTorres& torres, ListaEnemigos& enemigos,
     }
 }
 
-
+//Helpers SDL2
 void setCol(SDL_Renderer* r,SDL_Color c){ SDL_SetRenderDrawColor(r,c.r,c.g,c.b,c.a); }
 void fillR(SDL_Renderer* r,int x,int y,int w,int h,SDL_Color c){ setCol(r,c); SDL_Rect rc{x,y,w,h}; SDL_RenderFillRect(r,&rc); }
 void drawR(SDL_Renderer* r,int x,int y,int w,int h,SDL_Color c){ setCol(r,c); SDL_Rect rc{x,y,w,h}; SDL_RenderDrawRect(r,&rc); }
@@ -326,7 +326,7 @@ void drawBarra(SDL_Renderer* r,int x,int y,int w,int h,int act,int mx){
 
 int posAX(int p){ return RUTA_INI_X+p*CELDA_PX; }
 
-
+//Definición del HUD
 void dibujarHUD(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
                 EstadoJuego& est,ListaOleadas& ols,ListaTorres& torres){
     fillR(r,0,0,PANEL_X,HUD_H,C_PANEL);
@@ -393,7 +393,7 @@ void dibujarJuego(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
         nd=nd->siguiente;
     }
 }
-
+//Representación Grafica
 void dibujarLog(SDL_Renderer* r,TTF_Font* fP,LogSistema& log){
     int ly=HUD_H+JUEGO_H;
     fillR(r,0,ly,PANEL_X,LOG_H,C_PANEL);
