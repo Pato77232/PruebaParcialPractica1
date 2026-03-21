@@ -329,3 +329,218 @@ void drawBarra(SDL_Renderer* r,int x,int y,int w,int h,int act,int mx){
     if(ll>0)fillR(r,x,y,ll,h,c);
     drawR(r,x,y,w,h,{80,80,80,180});
 }
+//definimos como se mostrara el hud de nuestrojuego
+int posAX(int p){ return RUTA_INI_X+p*CELDA_PX; }
+
+void dibujarHUD(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
+                EstadoJuego& est,ListaOleadas& ols,ListaTorres& torres){
+    fillR(r,0,0,PANEL_X,HUD_H,C_PANEL);
+    drawL(r,0,HUD_H,PANEL_X,HUD_H,C_BORDE);
+    SDL_Color cv=est.vidas>2?C_VERDE:C_ROJO;
+    drawTxt(r,fN,"Vidas: "+to_string(est.vidas),12,15,cv);
+    drawTxt(r,fN,"Oro: "+to_string(est.oro),170,15,C_ORO);
+    drawTxt(r,fN,"Turno: "+to_string(est.turno),330,15,C_SEC);
+    drawTxt(r,fN,"Oleada: "+to_string(ols.getLanzadas())+"/20",480,15,C_AZUL);
+    drawTxt(r,fN,"Torres: "+to_string(torres.contar())+"/"+to_string(MAX_TORRES),650,15,C_VERDE);
+}
+
+void dibujarJuego(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
+                  ListaTorres& torres,ListaEnemigos& enemigos){
+    fillR(r,0,HUD_H,PANEL_X,JUEGO_H,C_BG);
+
+    // Rangos semitransparentes
+    SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
+    for(int i=0;i<torres.contar();i++){
+        Torre& t=torres.obtener(i);
+        int cx=posAX(t.posicion), rw=t.rango*CELDA_PX;
+        SDL_Color cr=(t.tipo=="Canon")?SDL_Color{251,146,60,25}:C_RANGO;
+        fillR(r,cx-rw,RUTA_Y_C-RUTA_ALTO/2-8,rw*2,RUTA_ALTO+16,cr);
+    }
+    SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_NONE);
+
+    // Camino
+    fillR(r,RUTA_INI_X,RUTA_Y_C-RUTA_ALTO/2,(LIMITE_RUTA+1)*CELDA_PX,RUTA_ALTO,C_RUTA);
+    for(int i=0;i<=LIMITE_RUTA;i++){
+        int x=posAX(i);
+        drawL(r,x,RUTA_Y_C-RUTA_ALTO/2,x,RUTA_Y_C+RUTA_ALTO/2,C_RUTA_B);
+    }
+    drawR(r,RUTA_INI_X,RUTA_Y_C-RUTA_ALTO/2,(LIMITE_RUTA+1)*CELDA_PX,RUTA_ALTO,C_RUTA_B);
+    drawTxt(r,fP,"INICIO",RUTA_INI_X,RUTA_Y_C+RUTA_ALTO/2+5,C_SEC);
+    drawTxt(r,fP,"META",posAX(LIMITE_RUTA)-16,RUTA_Y_C+RUTA_ALTO/2+5,C_ROJO);
+    for(int i=0;i<=LIMITE_RUTA;i+=5)
+        drawTxt(r,fP,to_string(i),posAX(i)+2,RUTA_Y_C-RUTA_ALTO/2-16,C_SEC);
+
+    // Torres
+    for(int i=0;i<torres.contar();i++){
+        Torre& t=torres.obtener(i);
+        int cx=posAX(t.posicion), ty=RUTA_Y_C-RUTA_ALTO/2-60;
+        SDL_Color ct=(t.tipo=="Canon")?C_NARANJA:(t.tipo=="Mago")?C_MORADO:C_VERDE;
+        fillR(r,cx-11,ty,22,46,ct);
+        fillR(r,cx-4,ty-12,8,15,ct);
+        drawTxt(r,fP,t.nombre,cx,ty-26,ct,true);
+        drawTxt(r,fP,"D:"+to_string(t.danio)+" R:"+to_string(t.rango),cx,ty+48,C_SEC,true);
+        drawTxt(r,fP,"#"+to_string(t.id)+" ["+to_string(t.posicion)+"]",cx,RUTA_Y_C+RUTA_ALTO/2+5,C_SEC,true);
+    }
+
+    // Enemigos
+    NodoEnemigo* nd=enemigos.getPrimero();
+    while(nd){
+        Enemigo& e=nd->dato;
+        int ex=posAX(e.posicion);
+        SDL_Color ce=(e.tipo=="Rapido")?C_MORADO:(e.tipo=="Tanque")?C_AZUL:C_ROJO;
+        int ew=(e.tipo=="Tanque")?20:14;
+        fillR(r,ex-ew,RUTA_Y_C-ew,ew*2,ew*2,ce);
+        drawBarra(r,ex-18,RUTA_Y_C-ew-12,36,6,e.vida,e.vidaMax);
+        // Letra identificadora
+        char letra=e.tipo[0];
+        drawTxt(r,fP,string(1,letra),ex,RUTA_Y_C-8,{255,255,255,255},true);
+        nd=nd->siguiente;
+    }
+}
+//represenaciones logicas graficas
+void dibujarLog(SDL_Renderer* r,TTF_Font* fP,LogSistema& log){
+    int ly=HUD_H+JUEGO_H;
+    fillR(r,0,ly,PANEL_X,LOG_H,C_PANEL);
+    drawL(r,0,ly,PANEL_X,ly,C_BORDE);
+    drawTxt(r,fP,"LOG DE EVENTOS",8,ly+5,C_SEC);
+    for(int i=0;i<(int)log.lineas.size();i++)
+        drawTxt(r,fP,log.lineas[i],8,ly+20+i*13,C_TEXTO);
+}
+//se dibuja cada panel para el juego
+void dibujarPanel(SDL_Renderer* r,TTF_Font* fN,TTF_Font* fP,
+                  MenuEstado est,DatosTorreTemp& tmp,
+                  ListaTorres& torres,ListaOleadas& ols,
+                  const string& inp,const string& err,bool hayErr){
+    fillR(r,PANEL_X,0,PANEL_W,ALTO,C_PANEL);
+    drawL(r,PANEL_X,0,PANEL_X,ALTO,C_BORDE);
+    int x=PANEL_X+12, y=12;
+
+    if(est==MENU_PRINCIPAL){
+        drawTxt(r,fN,"== MENU PRINCIPAL ==",x,y,C_AZUL); y+=30;
+        drawL(r,PANEL_X,y,PANEL_X+PANEL_W,y,C_BORDE); y+=10;
+
+        struct Op{ string k,lbl; SDL_Color c; };
+        Op ops[]={{"[1]","Registrar torre",C_VERDE},{"[2]","Mostrar torres",C_TEXTO},
+                  {"[3]","Eliminar torre",C_NARANJA},{"[4]","Mostrar oleadas",C_TEXTO},
+                  {"[5]","Iniciar oleada",C_AZUL},{"[6]","Avanzar turno",C_ORO},
+                  {"[ESC]","Salir",C_ROJO}};
+        for(auto& o:ops){
+            drawTxt(r,fP,o.k,x,y,C_SEC);
+            drawTxt(r,fP,o.lbl,x+54,y,o.c);
+            y+=26;
+        }
+        y+=8; drawL(r,PANEL_X,y,PANEL_X+PANEL_W,y,C_BORDE); y+=10;
+
+        // Estado rÃ¡pido de torres en campo
+        drawTxt(r,fP,"Torres en campo ("+to_string(torres.contar())+"/"+to_string(MAX_TORRES)+"):",x,y,C_SEC); y+=17;
+        if(torres.contar()==0){
+            drawTxt(r,fP,"  Sin torres",x,y,C_SEC); y+=15;
+        } else {
+            for(int i=0;i<torres.contar()&&y<ALTO-60;i++){
+                Torre& t=torres.obtener(i);
+                SDL_Color ct=(t.tipo=="Canon")?C_NARANJA:(t.tipo=="Mago")?C_MORADO:C_VERDE;
+                string lt="#"+to_string(t.id)+" "+t.nombre+" [pos:"+to_string(t.posicion)+
+                          " D:"+to_string(t.danio)+" R:"+to_string(t.rango)+"]";
+                drawTxt(r,fP,lt,x,y,ct); y+=14;
+            }
+        }
+
+    } else if(est==MENU_REG_TORRE){
+        drawTxt(r,fN,"== REGISTRAR TORRE ==",x,y,C_VERDE); y+=28;
+        drawTxt(r,fP,"Casillas libres: "+to_string(MAX_TORRES-torres.contar()),x,y,C_SEC); y+=20;
+        drawL(r,PANEL_X,y,PANEL_X+PANEL_W,y,C_BORDE); y+=10;
+
+        string pasos[]={"Nombre de la torre:","Tipo (1=Arquero 2=Canon 3=Mago):",
+                         "Posicion (0-19):","Danio:","Rango:","Costo (oro):"};
+        string vals[6];
+        vals[0]=tmp.nombre; vals[1]=tmp.tipo;
+        vals[2]=(tmp.posicion>=0)?to_string(tmp.posicion):"";
+        vals[3]=(tmp.danio>0)?to_string(tmp.danio):"";
+        vals[4]=(tmp.rango>0)?to_string(tmp.rango):"";
+        vals[5]=(tmp.costo>0)?to_string(tmp.costo):"";
+
+        for(int i=0;i<6;i++){
+            SDL_Color cl=(i<tmp.paso)?C_VERDE:(i==tmp.paso)?C_AZUL:C_SEC;
+            string lbl=pasos[i];
+            if(i<tmp.paso&&!vals[i].empty()) lbl+=" "+vals[i]+" OK";
+            drawTxt(r,fP,lbl,x,y,cl); y+=18;
+            if(i==tmp.paso){
+                fillR(r,x,y,PANEL_W-24,22,C_SEL);
+                drawR(r,x,y,PANEL_W-24,22,C_AZUL);
+                drawTxt(r,fP,"> "+inp+"_",x+4,y+4,C_TEXTO);
+                y+=26;
+            }
+        }
+        y+=10;
+        drawTxt(r,fP,"ENTER = confirmar | ESC = cancelar",x,y,C_SEC);//se dibuja paso a paso cada uno de lo menus y caracteristicas del juego
+
+    } else if(est==MENU_ELIM_TORRE){
+        drawTxt(r,fN,"== ELIMINAR TORRE ==",x,y,C_NARANJA); y+=28;
+        if(torres.contar()==0){
+            drawTxt(r,fP,"Sin torres que eliminar.",x,y,C_SEC);
+        } else {
+            for(int i=0;i<torres.contar()&&y<ALTO-120;i++){
+                Torre& t=torres.obtener(i);
+                SDL_Color ct=(t.tipo=="Canon")?C_NARANJA:(t.tipo=="Mago")?C_MORADO:C_VERDE;
+                drawTxt(r,fP,"#"+to_string(t.id)+" "+t.nombre+" [pos:"+to_string(t.posicion)+"]",x,y,ct);
+                y+=16;
+            }
+            y+=10;
+            drawTxt(r,fP,"ID a eliminar:",x,y,C_SEC); y+=18;
+            fillR(r,x,y,PANEL_W-24,22,C_SEL);
+            drawR(r,x,y,PANEL_W-24,22,C_ROJO);
+            drawTxt(r,fP,"> "+inp+"_",x+4,y+4,C_TEXTO); y+=30;
+            drawTxt(r,fP,"ENTER = confirmar | ESC = cancelar",x,y,C_SEC);
+        }//menu de eliminacion de torres
+
+    } else if(est==MENU_VER_TORRES){
+        drawTxt(r,fN,"== TORRES REGISTRADAS ==",x,y,C_VERDE); y+=28;
+        drawTxt(r,fP,"Total: "+to_string(torres.contar())+"/"+to_string(MAX_TORRES),x,y,C_SEC); y+=20;
+        if(torres.contar()==0){
+            drawTxt(r,fP,"No hay torres.",x,y,C_SEC);
+        } else {
+            for(int i=0;i<torres.contar()&&y<ALTO-60;i++){
+                Torre& t=torres.obtener(i);
+                SDL_Color ct=(t.tipo=="Canon")?C_NARANJA:(t.tipo=="Mago")?C_MORADO:C_VERDE;
+                drawTxt(r,fP,"#"+to_string(t.id)+" "+t.nombre+" ("+t.tipo+")",x,y,ct); y+=15;
+                drawTxt(r,fP,"  Pos:"+to_string(t.posicion)+" Dmg:"+to_string(t.danio)+
+                          " Rng:"+to_string(t.rango)+" Costo:"+to_string(t.costo),x,y,C_SEC); y+=18;
+            }
+        }//menu de visualizacion de torres
+        y=ALTO-30; drawTxt(r,fP,"[ESC] Volver al menu",x,y,C_ROJO);
+
+    } else if(est==MENU_VER_OLEADAS){
+        drawTxt(r,fN,"== 20 OLEADAS ==",x,y,C_AZUL); y+=24;
+        drawTxt(r,fP,"N=Normales R=Rapidos T=Tanques",x,y,C_SEC); y+=18;
+        drawL(r,PANEL_X,y,PANEL_X+PANEL_W,y,C_BORDE); y+=6;
+        int lanz=ols.getLanzadas();
+        NodoOleada* nd=ols.getPrimero();
+        while(nd&&y<ALTO-40){
+            Oleada& o=nd->dato;
+            bool actv=(o.idOleada==lanz+1);
+            bool hecha=(o.idOleada<=lanz);
+            SDL_Color co=actv?C_ORO:(hecha?C_SEC:C_TEXTO);
+            string pfx=actv?">> ":(hecha?"OK ":"   ");
+            string lt=pfx+"Ol."+to_string(o.idOleada)+
+                      ": N"+to_string(o.cantNormales)+
+                      " R"+to_string(o.cantRapidos)+
+                      " T"+to_string(o.cantTanques);
+            drawTxt(r,fP,lt,x,y,co); y+=13;
+            string vl="   vN:"+to_string(o.vidaNormal);
+            if(o.vidaRapido) vl+=" vR:"+to_string(o.vidaRapido);
+            if(o.vidaTanque) vl+=" vT:"+to_string(o.vidaTanque);
+            drawTxt(r,fP,vl,x,y,actv?C_ORO:C_SEC); y+=14;
+            if(nd==ols.getUltimo()) break;
+            nd=nd->siguiente;
+        }
+        y=ALTO-30; drawTxt(r,fP,"[ESC] Volver al menu",x,y,C_ROJO);
+    }
+
+    // Banner de error/confirmacion en la parte baja del panel
+    if(hayErr && !err.empty()){
+        fillR(r,PANEL_X,ALTO-50,PANEL_W,50,{55,10,10,240});
+        drawR(r,PANEL_X,ALTO-50,PANEL_W,50,C_ROJO);
+        drawTxt(r,fP,err,PANEL_X+8,ALTO-44,C_ROJO);
+        drawTxt(r,fP,"Presiona cualquier tecla",PANEL_X+8,ALTO-28,C_SEC);
+    }
+}
