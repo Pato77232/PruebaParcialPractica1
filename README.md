@@ -1,7 +1,7 @@
 <img width="1468" height="865" alt="image" src="https://github.com/user-attachments/assets/ce98466c-99c4-4011-bfd9-1355840d3728" />
 
 ---
-# PruebaParcialPractica1
+# Prueba Parcial Practica 1
 
 #Para el correcto funcionamiento de este proyecto se necesita instalar SDL2 y SDL2_ttf  
 #Se recomienda usar el IDE CLion para ejecutar el código fuente.  
