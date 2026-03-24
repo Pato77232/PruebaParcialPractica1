@@ -1,4 +1,4 @@
-# PruebaParcialPractica1
+<img width="1468" height="865" alt="image" src="https://github.com/user-attachments/assets/ce98466c-99c4-4011-bfd9-1355840d3728" /># PruebaParcialPractica1
 
 #Para el correcto funcionamiento de este proyecto se necesita instalar SDL2 y SDL2_ttf  
 #Se recomienda usar el IDE CLion para ejecutar el código fuente.  
@@ -162,46 +162,8 @@ struct NodoOleada {
 
 ## Diagrama de Clases
 
-```
-┌──────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  ListaTorres │    │  ListaEnemigos   │    │  ListaOleadas   │
-│──────────────│    │──────────────────│    │─────────────────│
-│ datos[20]    │    │ *primero         │    │ *ultimo         │
-│ cantidad     │    │ *ultimo          │    │ *actual         │
-│ nextId       │    │ cantidad         │    │ cantidad        │
-│──────────────│    │──────────────────│    │ lanzadas        │
-│ insertar()   │    │ insertarFinal()  │    │─────────────────│
-│ eliminar()   │    │ eliminar()       │    │ registrar()     │
-│ buscar()     │    │ getPrimero()     │    │ avanzar()       │
-│ contar()     │    │ estaVacio()      │    │ oleadaActual()  │
-│casillaLibre()│    │ limpiar()        │    │ getLanzadas()   │
-│ obtener()    │    └──────────────────┘    └─────────────────┘
-└──────────────┘             │                      │
-       │                     └──────────┬───────────┘
-       └───────────────────────────────┐│
-                                       ▼▼
-                              ┌─────────────────┐
-                              │   EstadoJuego   │
-                              │─────────────────│
-                              │ vidas           │
-                              │ turno           │
-                              │ oro             │
-                              │ terminado       │
-                              │ victoria        │
-                              └─────────────────┘
-                                       │
-                              ┌────────┴────────┐
-                              │  procesarTurno()│
-                              │  + SDL2 render  │
-                              └────────────────┘
-                                       ▲
-                              ┌────────┴────────┐
-                              │    main()       │
-                              │  game loop SDL2 │
-                              └─────────────────┘
-```
+<img width="1509" height="1019" alt="image" src="https://github.com/user-attachments/assets/ec30cc03-bf44-45eb-af04-8c86e6b5085c" />
 
----
 
 ## Lógica de cada turno
 
@@ -313,3 +275,12 @@ add_custom_command(TARGET TowerDefense POST_BUILD
 - La separacion entre logica del juego (juego.h) y presentacion grafica (main.cpp) facilita el mantenimiento y permite reemplazar la interfaz SDL2 sin modificar las estructuras de datos.
 - SDL_ttf permitio presentar informacion dinamica de forma legible, mejorando significativamente la experiencia de evaluacion respecto a una version de consola
 •
+
+## Anexos
+<img width="1468" height="865" alt="image" src="https://github.com/user-attachments/assets/1f7cfc01-e633-4db2-aeda-4318d1bb8fa5" />
+
+<img width="1480" height="852" alt="image" src="https://github.com/user-attachments/assets/c4e3a8f3-3075-4df3-973f-11628aca8164" />
+
+<img width="1484" height="847" alt="image" src="https://github.com/user-attachments/assets/026d80b4-d5fb-4337-9008-c284cb964657" />
+
+
