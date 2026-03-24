@@ -21,7 +21,7 @@ Emmanuel Acosta (Colaborador)
 David Cuenca (Colaborador)
 Michael Rosillo (Colaborador
 
----
+----
 
 ## Descripción
 
@@ -31,7 +31,7 @@ El juego consiste en defender una ruta de posiciones `0→20` colocando torres d
 
 La interfaz gráfica está construida con **SDL2**, pero la lógica de datos (listas, nodos, oleadas) es completamente independiente de la capa visual.
 
----
+----
 
 ## Estructura del Proyecto
 
@@ -62,7 +62,7 @@ C:\SDL2\
 └── bin\              # SDL2.dll y SDL2_ttf.dll
 ```
 
----
+----
 
 ## Estructuras de Datos Implementadas
 
@@ -91,7 +91,7 @@ struct Torre {
 | `contar()` | Cantidad de torres activas |
 | `obtener(idx)` | Acceso directo por índice para la lógica del turno |
 
----
+----
 
 ### 2. Lista Doblemente Enlazada — Enemigos Activos
 
@@ -119,7 +119,7 @@ struct NodoEnemigo {
 | `estaVacio()` | Verifica si hay enemigos en campo |
 | `limpiar()` | Libera todos los nodos al reiniciar |
 
----
+----
 
 ### 3. Lista Circular Simplemente Enlazada — Oleadas
 
@@ -181,7 +181,7 @@ Cada vez que se presiona **[6] Avanzar turno**, el sistema ejecuta:
                           oleadas == 20   → VICTORIA
 ```
 
----
+----
 
 ## Menú (Panel lateral SDL2)
 
@@ -220,10 +220,10 @@ Cada vez que se presiona **[6] Avanzar turno**, el sistema ejecuta:
 
 **Torres precargadas al iniciar:**
 
-| # | Nombre | Tipo | Posición | Daño | Rango | Costo |
-|---|--------|------|----------|------|-------|-------|
-| 1 | Arquero | Arquero | 3 | 20 | 2 | 50 |
-| 2 | Cañón | Canon | 8 | 35 | 3 | 80 |
+| # | Nombre  | Tipo | Posición | Daño | Rango | Costo |
+|---|---------|------|----------|------|-------|-------|
+| 1 | Arquero | Arquero |   3   |  20  |   2   |   50  |
+| 2 | Cañón   | Canon |    8    |  35  |   3   |   80  |
 
 **Oleadas 1 y 2 precargadas:**
 
