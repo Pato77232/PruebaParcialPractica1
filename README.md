@@ -302,4 +302,9 @@ add_custom_command(TARGET TowerDefense POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${SDL2_PATH}/bin/SDL2_ttf.dll" $<TARGET_FILE_DIR:TowerDefense>
 )
+
 ```
+Conclusiones
+La lista secuencial es adecuada para torres porque el numero maximo es fijo (20) y el acceso O(1) por indice es necesario para el renderer, que itera todas las torres en cada frame.
+•	La lista doblemente enlazada es la mejor eleccion para enemigos activos porque las eliminaciones ocurren frecuentemente y la reconexion de punteros O(1) evita el costo de desplazar elementos que tendria un arreglo.
+•	La lista circular simplifica el control de oleadas: el puntero actual avanza naturalmente y la propiedad circular permite reiniciar el ciclo sin logica adicional de limites.
