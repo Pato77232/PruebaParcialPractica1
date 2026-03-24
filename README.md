@@ -86,7 +86,8 @@ struct Torre {
 |--------|-------------|
 | `insertar(...)` | Valida casilla libre y límite de 20 torres |
 | `eliminar(id)` | Elimina por ID y desplaza el arreglo |
-| `buscar(id)` | Retorna puntero a Torre o `nullptr` |
+| `buscar(id)` | Retorna puntero a Torre o `nullptr` 
+|               | (Funcionalidad interna del juego, no axesible por jugador) |
 | `casillaLibre(pos)` | Verifica si una posición está disponible |
 | `contar()` | Cantidad de torres activas |
 | `obtener(idx)` | Acceso directo por índice para la lógica del turno |
